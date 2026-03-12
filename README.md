@@ -1,0 +1,106 @@
+# Shop01 — E-Commerce Web Application
+
+An online webshop built with support for multiple payment methods.
+
+## Overview
+
+Shop01 is a full-featured e-commerce website where customers can browse products, add items to a cart, and complete purchases using their preferred payment method.
+
+## Features
+
+- Product catalog with categories and search
+- Shopping cart and checkout flow
+- User accounts and order history
+- Multiple payment method integrations:
+  - Credit / Debit Card (Stripe)
+  - PayPal
+  - Bank Transfer
+  - Buy Now Pay Later (e.g. Klarna)
+- Order management and confirmation emails
+- Admin dashboard for product and order management
+
+## Tech Stack
+
+| Layer    | Technology          |
+|----------|---------------------|
+| Frontend | HTML / CSS / JS (served by Go) |
+| Backend  | Go                  |
+| Database | PostgreSQL          |
+| Payments | Stripe / PayPal     |
+
+## Getting Started
+
+### Prerequisites
+
+- Go >= 1.22
+- PostgreSQL >= 16
+
+### Installation
+
+```bash
+git clone https://github.com/your-username/shop01.git
+cd shop01
+go mod download
+```
+
+### Environment Variables
+
+Copy the example env file and fill in your credentials:
+
+```bash
+cp .env.example .env
+```
+
+Key variables:
+
+```
+STRIPE_SECRET_KEY=
+PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+DATABASE_URL=postgres://user:password@localhost:5432/shop01
+```
+
+### Running Locally
+
+```bash
+go run ./cmd/server
+```
+
+## Project Structure
+
+```
+shop01/
+├── cmd/
+│   └── server/         # Application entry point (main.go)
+├── internal/
+│   ├── handlers/       # HTTP handlers
+│   ├── models/         # Data models
+│   ├── payments/       # Payment provider integrations
+│   └── store/          # Database access layer
+├── web/
+│   ├── templates/      # HTML templates
+│   └── static/         # CSS, JS, images
+├── go.mod
+├── go.sum
+└── .env.example        # Environment variable template
+```
+
+## Payment Integration
+
+Each payment provider is integrated via its official SDK:
+
+- **Stripe** — card payments, webhooks for order confirmation
+- **PayPal** — PayPal wallet and card payments via PayPal SDK
+- **Bank Transfer** — manual or automated via banking API
+- **BNPL** — Klarna or similar, embedded at checkout
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "feat: add your feature"`
+4. Push and open a Pull Request
+
+## License
+
+MIT

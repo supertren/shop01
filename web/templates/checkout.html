@@ -1,0 +1,24 @@
+{{ template "layout" . }}
+
+{{ define "content" }}
+<section class="checkout-page">
+    <h1>Checkout</h1>
+
+    <form action="/checkout" method="POST" class="checkout-form">
+        <h2>Shipping Details</h2>
+        <label>Full Name <input type="text" name="name" required></label>
+        <label>Email <input type="email" name="email" required></label>
+        <label>Address <input type="text" name="address" required></label>
+        <label>City <input type="text" name="city" required></label>
+        <label>Postal Code <input type="text" name="postal_code" required></label>
+
+        <h2>Payment Method</h2>
+        <label><input type="radio" name="payment" value="stripe" checked> Credit / Debit Card (Stripe)</label>
+        <label><input type="radio" name="payment" value="paypal"> PayPal</label>
+        <label><input type="radio" name="payment" value="bank_transfer"> Bank Transfer</label>
+        <label><input type="radio" name="payment" value="klarna"> Buy Now Pay Later (Klarna)</label>
+
+        <button type="submit" class="btn btn-primary">Place Order</button>
+    </form>
+</section>
+{{ end }}

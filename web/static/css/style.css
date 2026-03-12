@@ -1,0 +1,60 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: system-ui, sans-serif;
+    color: #1a1a1a;
+    background: #f9f9f9;
+    line-height: 1.6;
+}
+
+/* Nav */
+header { background: #fff; border-bottom: 1px solid #e5e5e5; padding: 0 2rem; }
+nav { display: flex; align-items: center; justify-content: space-between; height: 60px; max-width: 1100px; margin: 0 auto; }
+.logo { font-size: 1.4rem; font-weight: 700; text-decoration: none; color: #1a1a1a; }
+nav ul { list-style: none; display: flex; gap: 1.5rem; }
+nav a { text-decoration: none; color: #555; }
+nav a:hover { color: #000; }
+
+/* Main */
+main { max-width: 1100px; margin: 2rem auto; padding: 0 2rem; }
+
+/* Hero */
+.hero { text-align: center; padding: 4rem 0; }
+.hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+.hero p { font-size: 1.2rem; color: #555; margin-bottom: 2rem; }
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.6rem 1.4rem;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+.btn:hover { background: #333; }
+.btn-primary { background: #0070f3; }
+.btn-primary:hover { background: #005bb5; }
+
+/* Product grid */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+.product-card { background: #fff; border: 1px solid #e5e5e5; border-radius: 8px; padding: 1.2rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.product-card h3 { font-size: 1.1rem; }
+.product-card h3 a { text-decoration: none; color: inherit; }
+.product-card p { color: #666; font-size: 0.9rem; flex: 1; }
+.price { font-weight: 700; font-size: 1.1rem; color: #0070f3; }
+
+/* Checkout */
+.checkout-form { max-width: 520px; display: flex; flex-direction: column; gap: 1rem; }
+.checkout-form h2 { margin-top: 1rem; }
+.checkout-form label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.95rem; }
+.checkout-form input[type="text"],
+.checkout-form input[type="email"] { padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; }
+.checkout-form input[type="radio"] { margin-right: 0.4rem; }
+.checkout-form label:has(input[type="radio"]) { flex-direction: row; align-items: center; }
+
+/* Footer */
+footer { text-align: center; padding: 2rem; color: #999; font-size: 0.85rem; margin-top: 4rem; border-top: 1px solid #e5e5e5; }
