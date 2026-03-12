@@ -1,28 +1,52 @@
 package handlers
 
 import (
+	"errors"
+	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/your-username/shop01/internal/models"
+	"github.com/your-username/shop01/internal/store"
 )
 
 func (h *Handler) Products(w http.ResponseWriter, r *http.Request) {
-	// TODO: fetch all products from DB
+	products, err := h.db.ListProducts(r.Context())
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
 	data := struct {
 		Title    string
 		Products []models.Product
 	}{
 		Title:    "Products",
-		Products: []models.Product{},
+		Products: products,
 	}
 	h.render(w, "products.html", data)
 }
 
 func (h *Handler) ProductDetail(w http.ResponseWriter, r *http.Request) {
-	_ = chi.URLParam(r, "id")
-	// TODO: fetch product by ID from DB
-	h.render(w, "product_detail.html", nil)
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid product ID", http.StatusBadRequest)
+		return
+	}
+
+	product, err := h.db.GetProduct(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			http.Error(w, "Product not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	h.render(w, "product_detail.html", product)
 }
 
 func (h *Handler) Cart(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +54,30 @@ func (h *Handler) Cart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
-	// TODO: add product to session-based cart
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	idStr := r.PostFormValue("product_id")
+	qtyStr := r.PostFormValue("quantity")
+
+	productID, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid Product ID", http.StatusBadRequest)
+		return
+	}
+
+	quantity, err := strconv.Atoi(qtyStr)
+	if err != nil || quantity < 1 {
+		http.Error(w, "Invalid Quantity", http.StatusBadRequest)
+		return
+	}
+
+	// TODO: Validate productID exists and quantity is within stock limits.
+	// TODO: Add product to a session-based cart.
+	log.Printf("ACTION: Add to cart ProductID=%d, Quantity=%d", productID, quantity)
+
 	http.Redirect(w, r, "/cart", http.StatusSeeOther)
 }
 

@@ -57,6 +57,7 @@ Key variables:
 STRIPE_SECRET_KEY=
 PAYPAL_CLIENT_ID=
 PAYPAL_CLIENT_SECRET=
+KLARNA_CLIENT_ID=
 DATABASE_URL=postgres://user:password@localhost:5432/shop01
 ```
 

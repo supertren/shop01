@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -19,8 +20,11 @@ func New(db *store.DB) *Handler {
 }
 
 func (h *Handler) render(w http.ResponseWriter, name string, data any) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if err := h.templates.ExecuteTemplate(w, name, data); err != nil {
+	var buf bytes.Buffer
+	if err := h.templates.ExecuteTemplate(&buf, name, data); err != nil {
 		http.Error(w, "template error: "+err.Error(), http.StatusInternalServerError)
+		return
 	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, _ = w.Write(buf.Bytes())
 }
