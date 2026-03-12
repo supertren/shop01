@@ -1,30 +1,46 @@
 package handlers
 
 import (
-	"bytes"
+	"fmt"
 	"html/template"
+	"log"
 	"net/http"
-	"path/filepath"
 
 	"github.com/your-username/shop01/internal/store"
 )
 
+// Handler holds application-wide dependencies.
 type Handler struct {
-	db        *store.DB
-	templates *template.Template
+	db *store.DB
+	// In a real app, templates should be parsed once and cached for performance.
 }
 
+// New creates a new Handler with dependencies.
 func New(db *store.DB) *Handler {
-	tmpl := template.Must(template.ParseGlob(filepath.Join("web", "templates", "*.html")))
-	return &Handler{db: db, templates: tmpl}
+	return &Handler{
+		db: db,
+	}
 }
 
+// render executes a template.
+// NOTE: Parsing templates on every request is inefficient. This should be
+// optimized in a production application by caching the parsed templates.
 func (h *Handler) render(w http.ResponseWriter, name string, data any) {
-	var buf bytes.Buffer
-	if err := h.templates.ExecuteTemplate(&buf, name, data); err != nil {
-		http.Error(w, "template error: "+err.Error(), http.StatusInternalServerError)
+	files := []string{
+		"web/templates/layouts/base.html",
+		fmt.Sprintf("web/templates/pages/%s", name),
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Printf("error parsing template %s: %v", name, err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = w.Write(buf.Bytes())
+
+	if err := ts.ExecuteTemplate(w, "base.html", data); err != nil {
+		log.Printf("error executing template %s: %v", name, err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
+

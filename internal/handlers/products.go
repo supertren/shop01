@@ -14,6 +14,7 @@ import (
 func (h *Handler) Products(w http.ResponseWriter, r *http.Request) {
 	products, err := h.db.ListProducts(r.Context())
 	if err != nil {
+		log.Printf("error listing products: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -32,6 +33,7 @@ func (h *Handler) ProductDetail(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
+		log.Printf("invalid product ID in URL: %q", idStr)
 		http.Error(w, "Invalid product ID", http.StatusBadRequest)
 		return
 	}
@@ -42,6 +44,7 @@ func (h *Handler) ProductDetail(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Product not found", http.StatusNotFound)
 			return
 		}
+		log.Printf("error getting product %d: %v", id, err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
@@ -55,6 +58,7 @@ func (h *Handler) Cart(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
+		log.Printf("error parsing add to cart form: %v", err)
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
@@ -64,12 +68,14 @@ func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 
 	productID, err := strconv.Atoi(idStr)
 	if err != nil {
+		log.Printf("invalid product_id in form: %q", idStr)
 		http.Error(w, "Invalid Product ID", http.StatusBadRequest)
 		return
 	}
 
 	quantity, err := strconv.Atoi(qtyStr)
 	if err != nil || quantity < 1 {
+		log.Printf("invalid quantity in form: %q", qtyStr)
 		http.Error(w, "Invalid Quantity", http.StatusBadRequest)
 		return
 	}

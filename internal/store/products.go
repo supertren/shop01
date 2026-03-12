@@ -36,13 +36,7 @@ func (db *DB) ListProducts(ctx context.Context) ([]models.Product, error) {
 		FROM products
 		ORDER BY id ASC
 	`
-	rows, err := db.Pool.Query(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	return scanProducts(rows)
+	return db.queryAndScanProducts(ctx, query)
 }
 
 func (db *DB) ListFeaturedProducts(ctx context.Context) ([]models.Product, error) {
@@ -53,7 +47,12 @@ func (db *DB) ListFeaturedProducts(ctx context.Context) ([]models.Product, error
 		ORDER BY id ASC
 		LIMIT 4
 	`
-	rows, err := db.Pool.Query(ctx, query)
+	return db.queryAndScanProducts(ctx, query)
+}
+
+// queryAndScanProducts executes a query and scans the resulting rows into a slice of Products.
+func (db *DB) queryAndScanProducts(ctx context.Context, query string, args ...any) ([]models.Product, error) {
+	rows, err := db.Pool.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

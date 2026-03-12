@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
@@ -18,7 +19,7 @@ func main() {
 	_ = godotenv.Load()
 
 	// Connect to database
-	db, err := store.Connect(os.Getenv("DATABASE_URL"))
+	db, err := store.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatalf("could not connect to database: %v", err)
 	}
