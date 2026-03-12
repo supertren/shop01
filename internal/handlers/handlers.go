@@ -27,8 +27,8 @@ func New(db *store.DB) *Handler {
 // optimized in a production application by caching the parsed templates.
 func (h *Handler) render(w http.ResponseWriter, name string, data any) {
 	files := []string{
-		"web/templates/layouts/base.html",
-		fmt.Sprintf("web/templates/pages/%s", name),
+		"web/templates/layout.html",
+		fmt.Sprintf("web/templates/%s", name),
 	}
 
 	ts, err := template.ParseFiles(files...)
@@ -38,7 +38,7 @@ func (h *Handler) render(w http.ResponseWriter, name string, data any) {
 		return
 	}
 
-	if err := ts.ExecuteTemplate(w, "base.html", data); err != nil {
+	if err := ts.ExecuteTemplate(w, "layout", data); err != nil {
 		log.Printf("error executing template %s: %v", name, err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
