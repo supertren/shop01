@@ -42,20 +42,7 @@ func (db *DB) ListProducts(ctx context.Context) ([]models.Product, error) {
 	}
 	defer rows.Close()
 
-	var products []models.Product
-	for rows.Next() {
-		var p models.Product
-		if err := rows.Scan(&p.ID, &p.Name, &p.Description, &p.Price, &p.ImageURL, &p.Stock); err != nil {
-			return nil, err
-		}
-		products = append(products, p)
-	}
-
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return products, nil
+	return scanProducts(rows)
 }
 
 func (db *DB) ListFeaturedProducts(ctx context.Context) ([]models.Product, error) {
@@ -72,6 +59,11 @@ func (db *DB) ListFeaturedProducts(ctx context.Context) ([]models.Product, error
 	}
 	defer rows.Close()
 
+	return scanProducts(rows)
+}
+
+// scanProducts iterates over rows and scans them into a slice of Products.
+func scanProducts(rows pgx.Rows) ([]models.Product, error) {
 	var products []models.Product
 	for rows.Next() {
 		var p models.Product
@@ -81,5 +73,8 @@ func (db *DB) ListFeaturedProducts(ctx context.Context) ([]models.Product, error
 		products = append(products, p)
 	}
 
-	return products, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return products, nil
 }
