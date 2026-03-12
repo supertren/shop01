@@ -49,7 +49,14 @@ func (h *Handler) ProductDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.render(w, "product_detail.html", product)
+	data := struct {
+		Title   string
+		Product *models.Product
+	}{
+		Title:   product.Name,
+		Product: product,
+	}
+	h.render(w, "product_detail.html", data)
 }
 
 func (h *Handler) Cart(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +87,24 @@ func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Validate productID exists and quantity is within stock limits.
+	// Validate product exists
+	product, err := h.db.GetProduct(r.Context(), productID)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			http.Error(w, "Product not found", http.StatusNotFound)
+			return
+		}
+		log.Printf("error getting product %d: %v", productID, err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Validate quantity is within stock limits
+	if quantity > product.Stock {
+		http.Error(w, "Not enough items in stock", http.StatusBadRequest)
+		return
+	}
+
 	// TODO: Add product to a session-based cart.
 	log.Printf("ACTION: Add to cart ProductID=%d, Quantity=%d", productID, quantity)
 
