@@ -83,6 +83,20 @@ Update `DATABASE_URL` in your `.env` to match:
 DATABASE_URL=postgres://postgres:password@localhost:5432/shop01
 ```
 
+### Sample Data (Optional)
+
+To populate the database with sample products:
+
+```bash
+sudo -u postgres psql -d shop01 -c "
+INSERT INTO products (name, description, price, image_url, stock) VALUES
+('Wireless Headphones', 'High-quality over-ear headphones with noise cancellation.', 79.99, 'https://placehold.co/400x300?text=Headphones', 25),
+('Mechanical Keyboard', 'Compact TKL mechanical keyboard with RGB backlight.', 59.99, 'https://placehold.co/400x300?text=Keyboard', 15),
+('USB-C Hub', '7-in-1 USB-C hub with HDMI, USB 3.0, and SD card reader.', 34.99, 'https://placehold.co/400x300?text=USB+Hub', 40),
+('Webcam 1080p', 'Full HD webcam with built-in microphone and auto-focus.', 49.99, 'https://placehold.co/400x300?text=Webcam', 20);
+"
+```
+
 ### Running Locally
 
 ```bash
