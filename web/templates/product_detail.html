@@ -2,7 +2,26 @@
 
 {{ define "content" }}
 <section class="product-detail">
-    <p>Product detail coming soon.</p>
     <a href="/products">&larr; Back to products</a>
+    <div class="product-detail-card">
+        {{ if .Product.ImageURL }}
+        <img src="{{ .Product.ImageURL }}" alt="{{ .Product.Name }}">
+        {{ end }}
+        <div class="product-detail-info">
+            <h1>{{ .Product.Name }}</h1>
+            <p>{{ .Product.Description }}</p>
+            <span class="price">${{ printf "%.2f" .Product.Price }}</span>
+            {{ if gt .Product.Stock 0 }}
+            <p class="stock">In stock ({{ .Product.Stock }} available)</p>
+            <form action="/cart/add" method="POST" class="add-to-cart-form">
+                <input type="hidden" name="product_id" value="{{ .Product.ID }}">
+                <label>Qty: <input type="number" name="quantity" value="1" min="1" max="{{ .Product.Stock }}"></label>
+                <button type="submit" class="btn btn-primary">Add to Cart</button>
+            </form>
+            {{ else }}
+            <p class="stock out-of-stock">Out of stock</p>
+            {{ end }}
+        </div>
+    </div>
 </section>
 {{ end }}

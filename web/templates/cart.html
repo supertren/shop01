@@ -3,7 +3,49 @@
 {{ define "content" }}
 <section class="cart-page">
     <h1>Your Cart</h1>
-    <p>Cart functionality coming soon.</p>
-    <a href="/products">&larr; Continue shopping</a>
+
+    {{ if .Items }}
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Items }}
+            <tr>
+                <td><a href="/products/{{ .Product.ID }}">{{ .Product.Name }}</a></td>
+                <td>${{ printf "%.2f" .Product.Price }}</td>
+                <td>{{ .Quantity }}</td>
+                <td>${{ printf "%.2f" .Subtotal }}</td>
+                <td>
+                    <form action="/cart/remove" method="POST">
+                        <input type="hidden" name="product_id" value="{{ .Product.ID }}">
+                        <button type="submit" class="btn-remove">Remove</button>
+                    </form>
+                </td>
+            </tr>
+            {{ end }}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"><strong>Total</strong></td>
+                <td colspan="2"><strong class="price">${{ printf "%.2f" .Total }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="cart-actions">
+        <a href="/products" class="btn">&larr; Continue Shopping</a>
+        <a href="/checkout" class="btn btn-primary">Proceed to Checkout</a>
+    </div>
+    {{ else }}
+    <p>Your cart is empty.</p>
+    <a href="/products" class="btn" style="margin-top:1rem">&larr; Continue Shopping</a>
+    {{ end }}
 </section>
 {{ end }}

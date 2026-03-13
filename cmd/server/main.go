@@ -40,6 +40,7 @@ func main() {
 	r.Get("/products/{id}", h.ProductDetail)
 	r.Get("/cart", h.Cart)
 	r.Post("/cart/add", h.AddToCart)
+	r.Post("/cart/remove", h.RemoveFromCart)
 	r.Get("/checkout", h.Checkout)
 	r.Post("/checkout", h.PlaceOrder)
 

@@ -60,7 +60,30 @@ func (h *Handler) ProductDetail(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Cart(w http.ResponseWriter, r *http.Request) {
-	h.render(w, "cart.html", nil)
+	cart := readCart(r)
+
+	var items []models.CartItem
+	var total float64
+	for productID, qty := range cart {
+		product, err := h.db.GetProduct(r.Context(), productID)
+		if err != nil {
+			continue
+		}
+		item := models.CartItem{Product: *product, Quantity: qty}
+		items = append(items, item)
+		total += item.Subtotal()
+	}
+
+	data := struct {
+		Title string
+		Items []models.CartItem
+		Total float64
+	}{
+		Title: "Your Cart",
+		Items: items,
+		Total: total,
+	}
+	h.render(w, "cart.html", data)
 }
 
 func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
@@ -105,8 +128,29 @@ func (h *Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Add product to a session-based cart.
-	log.Printf("ACTION: Add to cart ProductID=%d, Quantity=%d", productID, quantity)
+	cart := readCart(r)
+	cart[productID] += quantity
+	writeCart(w, cart)
+
+	http.Redirect(w, r, "/cart", http.StatusSeeOther)
+}
+
+func (h *Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	idStr := r.PostFormValue("product_id")
+	productID, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid Product ID", http.StatusBadRequest)
+		return
+	}
+
+	cart := readCart(r)
+	delete(cart, productID)
+	writeCart(w, cart)
 
 	http.Redirect(w, r, "/cart", http.StatusSeeOther)
 }
@@ -117,5 +161,6 @@ func (h *Handler) Checkout(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) PlaceOrder(w http.ResponseWriter, r *http.Request) {
 	// TODO: process payment and create order
+	clearCart(w)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
