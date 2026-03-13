@@ -69,11 +69,12 @@ Make sure PostgreSQL is running:
 sudo systemctl start postgresql
 ```
 
-Then create the database and set the user password:
+Then create the database, set the user password, and apply the schema:
 
 ```bash
 sudo -u postgres psql -c "CREATE DATABASE shop01;"
 sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'password';"
+sudo -u postgres psql -d shop01 -f schema.sql
 ```
 
 Update `DATABASE_URL` in your `.env` to match:
