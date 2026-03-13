@@ -1,0 +1,12 @@
+{{ template "layout" . }}
+
+{{ define "content" }}
+<section class="order-success">
+    <div class="success-card">
+        <h1>Order Confirmed!</h1>
+        <p>Thank you for your purchase. Your payment was successful.</p>
+        <p class="order-ref">Order #{{ .OrderID }} &nbsp;&bull;&nbsp; Total: <strong>${{ printf "%.2f" .Total }}</strong></p>
+        <a href="/products" class="btn btn-primary">Continue Shopping</a>
+    </div>
+</section>
+{{ end }}

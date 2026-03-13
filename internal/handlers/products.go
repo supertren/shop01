@@ -160,7 +160,47 @@ func (h *Handler) Checkout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) PlaceOrder(w http.ResponseWriter, r *http.Request) {
-	// TODO: process payment and create order
-	clearCart(w)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+
+	cart := readCart(r)
+	if len(cart) == 0 {
+		http.Redirect(w, r, "/cart", http.StatusSeeOther)
+		return
+	}
+
+	var total float64
+	for productID, qty := range cart {
+		product, err := h.db.GetProduct(r.Context(), productID)
+		if err != nil {
+			continue
+		}
+		total += product.Price * float64(qty)
+	}
+
+	payment := r.PostFormValue("payment")
+	switch payment {
+	case "paypal":
+		scheme := "http"
+		if r.TLS != nil {
+			scheme = "https"
+		}
+		base := scheme + "://" + r.Host
+		order, err := h.paypal.CreateOrder(r.Context(), total, base+"/paypal/success", base+"/paypal/cancel")
+		if err != nil {
+			log.Printf("error creating paypal order: %v", err)
+			http.Error(w, "Failed to initiate PayPal payment", http.StatusInternalServerError)
+			return
+		}
+		approvalURL := order.ApprovalURL()
+		if approvalURL == "" {
+			http.Error(w, "No PayPal approval URL returned", http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, approvalURL, http.StatusSeeOther)
+	default:
+		http.Error(w, "Payment method not yet implemented", http.StatusNotImplemented)
+	}
 }
