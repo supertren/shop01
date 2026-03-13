@@ -61,11 +61,34 @@ KLARNA_CLIENT_ID=
 DATABASE_URL=postgres://user:password@localhost:5432/shop01
 ```
 
+### Database Setup
+
+Make sure PostgreSQL is running:
+
+```bash
+sudo systemctl start postgresql
+```
+
+Then create the database and set the user password:
+
+```bash
+sudo -u postgres psql -c "CREATE DATABASE shop01;"
+sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'password';"
+```
+
+Update `DATABASE_URL` in your `.env` to match:
+
+```
+DATABASE_URL=postgres://postgres:password@localhost:5432/shop01
+```
+
 ### Running Locally
 
 ```bash
 go run ./cmd/server
 ```
+
+The server will start at `http://localhost:8080`.
 
 ## Project Structure
 
